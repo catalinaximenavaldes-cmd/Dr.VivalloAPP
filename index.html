@@ -1,47 +1,47 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<link rel="stylesheet" href="estilos.css"> 
 <meta charset="UTF-8"> 
+<link rel="stylesheet" href="estilos.css"> 
+<title>Inicio</title>
 </head>
+
+<body>
+
+<h2>Menú principal</h2>
+
 <div style="margin-top:20px;">
-  <a href="Generar paciente.html" class="button"><button>Generar nuevo paciente</button></a>
-  <a href="pacientes.html" class="button"><button>Ver pacientes</button></a>
-  <a href="evolución.html" class="button"><button>Generar evolución</button></a>
+
+  <button onclick="irIngreso()">Generar nuevo paciente</button>
+
+  <button onclick="irPacientes()">Ver pacientes</button>
+
+  <button onclick="irEvolucion()">Generar evolución</button>
 
 </div>
+
 <script>
-// Simulación de paciente actual (puedes mejorarlo después)
-let pacienteActual = {
-  evolucion: ""
+
+function irIngreso() {
+  window.location.href = "Nuevo paciente.html";
 }
 
-// Botón: nuevo paciente
-function nuevoPaciente() {
-  // Limpiar selects
-  document.querySelectorAll("select").forEach(select => {
-    select.selectedIndex = 0;
-  });
-
-  // Limpiar texto
-  document.getElementById("resultado").value = "";
-
-  // Resetear paciente
-  pacienteActual = {
-    evolucion: ""
-  };
-
-  alert("Nuevo paciente listo");
+function irPacientes() {
+  window.location.href = "pacientes.html";
 }
 
-// Botón: ver paciente
-function verPaciente() {
-  let texto = document.getElementById("resultado").value;
+function irEvolucion() {
 
-  if (!texto) {
-    alert("No hay evolución generada");
+  let paciente = localStorage.getItem("pacienteActual");
+
+  if (!paciente) {
+    alert("Primero selecciona un paciente");
   } else {
-    alert("Evolución actual:\n\n" + texto);
+    window.location.href = "evolución.html";
   }
 }
+
 </script>
+
+</body>
+</html>
