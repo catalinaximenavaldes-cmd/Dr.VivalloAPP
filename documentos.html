@@ -17,31 +17,33 @@
         .btn-doc { padding: 20px; border-radius: 14px; border: 2px solid var(--verde-linea); background: linear-gradient(180deg, #ffffff 0%, #f4fbf7 100%); cursor: pointer; font-weight: bold; text-align: center; color: var(--verde-texto); }
         .btn-doc:hover { background: #edf8f1; }
         #contenedor-previa { display: none; margin-top: 20px; padding: 20px; background: #f9f9f9; border: 1px dashed #ccc; text-align: center; }
-        #area-impresion { display: none; background: linear-gradient(180deg, #f6fcf8 0%, #ffffff 18%); padding: 0; font-family: Georgia, "Times New Roman", serif; color: #000; text-align: left; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 148mm; min-height: 210mm; margin: 0 auto; box-sizing: border-box; overflow: hidden; border: 1px solid #dceee4; }
+        #visualizador-hoja { display: flex; justify-content: center; }
+        #visualizador-hoja iframe { width: 140mm; height: 198mm; border: 1px solid #dceee4; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.08); }
+        #area-impresion { display: none; background: linear-gradient(180deg, #f6fcf8 0%, #ffffff 18%); padding: 0; font-family: Georgia, "Times New Roman", serif; color: #000; text-align: left; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 140mm; min-height: 198mm; margin: 0 auto; box-sizing: border-box; overflow: hidden; border: 1px solid #dceee4; }
         @page { size: A5 portrait; margin: 10mm; }
         @media print {
-            @page { size: A5 portrait; margin: 10mm; }
+            @page { size: A5 portrait; margin: 0; }
             html, body { width: 148mm; min-height: 210mm; margin: 0; padding: 0; }
             body * { display: none !important; }
-            #area-impresion, #area-impresion * { display: block !important; }
-            #area-impresion { position: absolute; left: 0; top: 0; width: 148mm; min-height: 210mm; box-shadow: none; padding: 0; }
+            #contenedor-previa { display: block !important; padding: 0 !important; border: none !important; background: none !important; margin: 0 !important; }
+            #area-impresion { display: block !important; position: absolute; left: 0; top: 0; width: 140mm; min-height: 198mm; box-shadow: none; padding: 0; border: none; margin: 0; }
         }
-        .hoja-doc { min-height: 210mm; padding: 12mm 12mm 10mm; position: relative; }
-        .franja-doc { height: 8mm; background: linear-gradient(90deg, var(--verde-principal) 0%, #bde3cf 100%); margin: 0 -12mm 8mm; }
-        .header-receta { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; padding-bottom: 6mm; border-bottom: 2px solid var(--verde-linea); margin-bottom: 6mm; }
-        .marca-medica h2 { margin: 0; font-size: 22px; color: var(--verde-texto); letter-spacing: 0.2px; }
-        .marca-medica p { margin: 3px 0 0; font-size: 11px; color: var(--gris-texto); letter-spacing: 2px; text-transform: uppercase; }
-        .simbolo-medico { font-size: 34px; line-height: 1; color: var(--verde-principal); font-weight: bold; }
-        .subtitulo-documento { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 5mm; }
-        .subtitulo-documento h3 { margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: 2.5px; color: var(--verde-texto); }
-        .fecha-emision-doc { font-size: 11px; color: var(--gris-texto); }
-        .datos-paciente { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-bottom: 7mm; }
-        .campo-linea { display: flex; align-items: flex-end; gap: 6px; min-width: 0; }
-        .campo-linea .etiqueta { font-size: 11px; color: var(--gris-texto); white-space: nowrap; }
-        .campo-linea .valor { flex: 1; min-height: 18px; border-bottom: 1px solid var(--verde-linea); font-size: 12px; color: #26473b; padding-bottom: 1px; }
-        .rx-linea { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6mm; }
-        .rx-marca { font-size: 30px; font-weight: bold; color: var(--verde-texto); line-height: 1; }
-        #contenido-doc { min-height: 86mm; font-size: 15px; line-height: 1.7; white-space: pre-wrap; color: #243d34; }
+        .hoja-doc { min-height: 198mm; padding: 9mm 9mm 8mm; position: relative; box-sizing: border-box; display: flex; flex-direction: column; }
+        .franja-doc { height: 6mm; background: linear-gradient(90deg, var(--verde-principal) 0%, #bde3cf 100%); margin: 0 -9mm 7mm; }
+        .header-receta { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; padding-bottom: 5mm; border-bottom: 2px solid var(--verde-linea); margin-bottom: 5mm; }
+        .marca-medica h2 { margin: 0; font-size: 20px; color: var(--verde-texto); letter-spacing: 0.2px; }
+        .marca-medica p { margin: 2px 0 0; font-size: 10px; color: var(--gris-texto); letter-spacing: 1.8px; text-transform: uppercase; }
+        .simbolo-medico { font-size: 31px; line-height: 1; color: var(--verde-principal); font-weight: bold; }
+        .subtitulo-documento { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 4mm; }
+        .subtitulo-documento h3 { margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: 2.5px; color: var(--verde-texto); }
+        .fecha-emision-doc { font-size: 10px; color: var(--gris-texto); }
+        .datos-paciente { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; margin-bottom: 5mm; }
+        .campo-linea { display: flex; align-items: flex-end; gap: 5px; min-width: 0; }
+        .campo-linea .etiqueta { font-size: 10px; color: var(--gris-texto); white-space: nowrap; }
+        .campo-linea .valor { flex: 1; min-height: 15px; border-bottom: 1px solid var(--verde-linea); font-size: 11px; color: #26473b; padding-bottom: 1px; }
+        .rx-linea { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 4mm; }
+        .rx-marca { font-size: 26px; font-weight: bold; color: var(--verde-texto); line-height: 1; }
+        #contenido-doc { min-height: 72mm; font-size: 13px; line-height: 1.45; white-space: pre-wrap; color: #243d34; }
         .checklist-examenes { display: none; margin-top: 14px; padding: 16px; border: 1px solid #d7e9df; border-radius: 12px; background: #f7fcf9; }
         .checklist-examenes h4 { margin: 0 0 12px; color: var(--verde-texto); }
         .lista-checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px 16px; }
@@ -54,11 +56,11 @@
         .examen-item-impresion { display: flex; align-items: flex-start; gap: 8px; break-inside: avoid; }
         .examen-casilla { font-size: 14px; line-height: 1.3; margin-top: 1px; }
         .examen-texto { flex: 1; white-space: normal; }
-        .footer-receta { margin-top: 18mm; padding-top: 8mm; border-top: 1px solid #d8e8df; display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; }
+        .footer-receta { margin-top: auto; padding-top: 7mm; border-top: 1px solid #d8e8df; display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; }
         .firma-area { width: 42%; text-align: center; }
         .firma-linea { border-top: 1px solid var(--verde-linea); margin-bottom: 6px; }
-        .firma-area p { margin: 0; font-size: 11px; color: var(--gris-texto); }
-        .medico-detalle { flex: 1; font-size: 11px; color: var(--gris-texto); }
+        .firma-area p { margin: 0; font-size: 10px; color: var(--gris-texto); }
+        .medico-detalle { flex: 1; font-size: 10px; color: var(--gris-texto); }
         .medico-detalle p { margin: 3px 0; }
         @media (max-width: 700px) {
             .selector-doc { grid-template-columns: 1fr; }
@@ -116,7 +118,7 @@
         <p style="color:#e67e22; font-weight:bold; margin-bottom:15px;">Vista previa del documento:</p>
         <div id="visualizador-hoja"></div>
         <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
-            <button class="btn-guardar" style="background:#27ae60; padding:15px 30px;" onclick="window.print()">Todo correcto, Imprimir</button>
+            <button class="btn-guardar" style="background:#27ae60; padding:15px 30px;" onclick="imprimirDocumento()">Todo correcto, Imprimir</button>
             <button class="btn-volver" style="background:#34495e;" onclick="volverAEditar()">Editar texto</button>
         </div>
         <p id="status-guardado" style="font-size:12px; color:#7f8c8d; margin-top:10px;">Guardando copia en historial...</p>
@@ -382,7 +384,8 @@ function previsualizar() {
 
     document.getElementById("editor-documento").style.display = "none";
     document.getElementById("contenedor-previa").style.display = "block";
-    document.getElementById("area-impresion").style.display = "block";
+    document.getElementById("area-impresion").style.display = "none";
+    renderizarVistaPreviaDocumento();
 
     guardarCopiaAutomatica(contenido);
 }
@@ -413,9 +416,120 @@ function guardarCopiaAutomatica(texto) {
 function volverAEditar() {
     document.getElementById("contenedor-previa").style.display = "none";
     document.getElementById("area-impresion").style.display = "none";
+    document.getElementById("visualizador-hoja").innerHTML = "";
     document.getElementById("editor-documento").style.display = "block";
     document.getElementById("status-guardado").innerText = "Guardando copia en historial...";
     document.getElementById("status-guardado").style.color = "#7f8c8d";
+}
+
+function imprimirDocumento() {
+    const htmlDocumento = construirHtmlImpresionDocumento();
+    if (!htmlDocumento) {
+        alert("Primero genere la vista previa del documento.");
+        return;
+    }
+
+    const popup = window.open("", "_blank", "width=900,height=1200");
+    if (!popup) {
+        alert("El navegador bloqueo la ventana de impresion. Permita ventanas emergentes e intente nuevamente.");
+        return;
+    }
+
+    popup.document.open();
+    popup.document.write(htmlDocumento);
+    popup.document.close();
+    popup.focus();
+
+    setTimeout(() => {
+        popup.print();
+        popup.close();
+    }, 300);
+}
+
+function renderizarVistaPreviaDocumento() {
+    const htmlDocumento = construirHtmlImpresionDocumento();
+    const visualizador = document.getElementById("visualizador-hoja");
+    visualizador.innerHTML = "";
+    if (!htmlDocumento) return;
+
+    const iframe = document.createElement("iframe");
+    iframe.setAttribute("title", "Vista previa del documento");
+    iframe.srcdoc = htmlDocumento;
+    visualizador.appendChild(iframe);
+}
+
+function construirHtmlImpresionDocumento() {
+    const area = document.getElementById("area-impresion");
+    if (!area) return "";
+
+    const estilosLocales = Array.from(document.querySelectorAll("style"))
+        .map(style => quitarMediaPrint(style.innerHTML))
+        .join("\n");
+
+    return `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        ${estilosLocales}
+        body {
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        #area-impresion {
+            display: block !important;
+            margin: 0 auto !important;
+            box-shadow: none !important;
+            border: none !important;
+            width: 140mm !important;
+            min-height: 198mm !important;
+        }
+        @page {
+            size: A5 portrait;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    ${area.outerHTML}
+</body>
+</html>`;
+}
+
+function quitarMediaPrint(css) {
+    const patron = "@media print";
+    let resultado = "";
+    let indice = 0;
+
+    while (indice < css.length) {
+        const inicio = css.indexOf(patron, indice);
+        if (inicio === -1) {
+            resultado += css.slice(indice);
+            break;
+        }
+
+        resultado += css.slice(indice, inicio);
+
+        let abre = css.indexOf("{", inicio);
+        if (abre === -1) break;
+
+        let nivel = 1;
+        let cursor = abre + 1;
+        while (cursor < css.length && nivel > 0) {
+            if (css[cursor] === "{") nivel++;
+            if (css[cursor] === "}") nivel--;
+            cursor++;
+        }
+
+        indice = cursor;
+    }
+
+    return resultado;
 }
 </script>
 </body>

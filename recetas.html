@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="estilos.css">
+    <script src="url.js"></script>
+    <title>Documentos Ambulatorios</title>
+    <style>
+        .btn-ambulatorio { background-color: #16a085; color: white; }
+        .card-ambulatorio {
+            margin: 30px auto 0;
+            max-width: 920px;
+            background: linear-gradient(180deg, #ffffff 0%, #f2fbf7 100%);
+            border: 2px solid #b8dccb;
+            border-radius: 18px;
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+        }
+        .card-ambulatorio-header {
+            padding: 22px 24px 16px;
+            background: linear-gradient(90deg, #1f7a5c 0%, #63b995 100%);
+            color: white;
+        }
+        .card-ambulatorio-header h3 {
+            margin: 0 0 6px;
+            font-size: 1.4rem;
+        }
+        .card-ambulatorio-header p {
+            margin: 0;
+            opacity: 0.95;
+        }
+        .card-ambulatorio-body {
+            padding: 24px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px 18px;
+        }
+        .form-grid .campo {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-grid .campo-completo {
+            grid-column: 1 / -1;
+        }
+        .form-grid label {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 6px;
+        }
+        .tipo-documento {
+            margin-top: 22px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .tipo-documento button {
+            margin-top: 0;
+        }
+        .editor-ambulatorio {
+            margin-top: 22px;
+            padding: 18px;
+            border: 1px solid #d6e9df;
+            background: #fbfefc;
+            border-radius: 14px;
+            display: none;
+        }
+        .editor-ambulatorio h4 {
+            margin: 0 0 12px;
+            color: #1f5f4a;
+        }
+        .checklist-examenes {
+            display: none;
+            margin-top: 14px;
+            padding: 16px;
+            border: 1px solid #d7e9df;
+            border-radius: 12px;
+            background: #f7fcf9;
+        }
+        .checklist-examenes h5 {
+            margin: 0 0 12px;
+            color: #1f5f4a;
+            font-size: 1rem;
+        }
+        .lista-checks {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 10px 16px;
+        }
+        .item-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #26473b;
+            font-size: 15px;
+        }
+        .item-check input {
+            width: 16px;
+            height: 16px;
+            accent-color: #27ae60;
+        }
+        .acciones-ambulatorio {
+            display: flex;
+            gap: 12px;
+            margin-top: 14px;
+        }
+        .acciones-ambulatorio button {
+            margin-top: 0;
+            flex: 1;
+        }
+        #previa-ambulatorio {
+            display: none;
+            margin-top: 22px;
+            padding: 20px;
+            border: 1px dashed #95a5a6;
+            border-radius: 14px;
+            background: #f8fbf9;
+            text-align: center;
+        }
+        #visualizador-hoja-ambulatorio { display: flex; justify-content: center; }
+        #visualizador-hoja-ambulatorio iframe { width: 140mm; height: 198mm; border: 1px solid #dceee4; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.08); }
+        #area-impresion-ambulatorio { display: none; background: linear-gradient(180deg, #f6fcf8 0%, #ffffff 18%); padding: 0; font-family: Georgia, "Times New Roman", serif; color: #000; text-align: left; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 140mm; min-height: 198mm; margin: 0 auto; box-sizing: border-box; overflow: hidden; border: 1px solid #dceee4; }
+        .hoja-doc { min-height: 198mm; padding: 9mm 9mm 8mm; position: relative; box-sizing: border-box; display: flex; flex-direction: column; }
+        .franja-doc { height: 6mm; background: linear-gradient(90deg, #6fbf9d 0%, #bde3cf 100%); margin: 0 -9mm 7mm; }
+        .header-receta { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; padding-bottom: 5mm; border-bottom: 2px solid #8cc7ab; margin-bottom: 5mm; }
+        .marca-medica h2 { margin: 0; font-size: 20px; color: #2f6b58; letter-spacing: 0.2px; }
+        .marca-medica p { margin: 2px 0 0; font-size: 10px; color: #4e6a61; letter-spacing: 1.8px; text-transform: uppercase; }
+        .simbolo-medico { font-size: 31px; line-height: 1; color: #6fbf9d; font-weight: bold; }
+        .subtitulo-documento { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 4mm; }
+        .subtitulo-documento h3 { margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: 2.5px; color: #2f6b58; }
+        .fecha-emision-doc { font-size: 10px; color: #4e6a61; }
+        .datos-paciente-doc { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; margin-bottom: 5mm; }
+        .campo-linea { display: flex; align-items: flex-end; gap: 5px; min-width: 0; }
+        .campo-linea .etiqueta { font-size: 10px; color: #4e6a61; white-space: nowrap; }
+        .campo-linea .valor { flex: 1; min-height: 15px; border-bottom: 1px solid #8cc7ab; font-size: 11px; color: #26473b; padding-bottom: 1px; }
+        .rx-linea { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 4mm; }
+        .rx-marca { font-size: 26px; font-weight: bold; color: #2f6b58; line-height: 1; }
+        #contenido-ambulatorio-doc { min-height: 72mm; font-size: 13px; line-height: 1.45; white-space: pre-wrap; color: #243d34; }
+        .lista-examenes-impresion { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 18px; width: 100%; }
+        .examen-item-impresion { display: flex; align-items: flex-start; gap: 8px; break-inside: avoid; }
+        .examen-casilla { font-size: 14px; line-height: 1.3; margin-top: 1px; }
+        .examen-texto { flex: 1; white-space: normal; }
+        .footer-receta { margin-top: auto; padding-top: 7mm; border-top: 1px solid #d8e8df; display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; }
+        .firma-area { width: 42%; text-align: center; }
+        .firma-linea { border-top: 1px solid #8cc7ab; margin-bottom: 6px; }
+        .firma-area p { margin: 0; font-size: 10px; color: #4e6a61; }
+        .medico-detalle { flex: 1; font-size: 10px; color: #4e6a61; }
+        .medico-detalle p { margin: 3px 0; }
+        @page { size: A5 portrait; margin: 10mm; }
+        @media print {
+            @page { size: A5 portrait; margin: 0; }
+            html, body { width: 148mm; min-height: 210mm; margin: 0; padding: 0; }
+            body * { display: none !important; }
+            #previa-ambulatorio { display: block !important; padding: 0 !important; border: none !important; background: none !important; margin: 0 !important; }
+            #area-impresion-ambulatorio { display: block !important; position: absolute; left: 0; top: 0; width: 140mm; min-height: 198mm; box-shadow: none; padding: 0; border: none; margin: 0; }
+        }
+        @media (max-width: 640px) {
+            .form-grid,
+            .tipo-documento,
+            .lista-checks,
+            .lista-examenes-impresion,
+            .datos-paciente-doc {
+                grid-template-columns: 1fr;
+            }
+            .acciones-ambulatorio {
+                flex-direction: column;
+            }
+            .card-ambulatorio-header,
+            .card-ambulatorio-body {
+                padding: 18px 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="app-header">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <img src="logo-brasil.png" alt="Logo Brasil" style="height: 50px;">
+            <h1 style="color: white; margin: 0;">Dr.Vivallo</h1>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <button class="btn-volver" onclick="window.location.href='index.html'" style="max-width:220px;">Volver al inicio</button>
+
+        <section class="card-ambulatorio">
+            <div class="card-ambulatorio-header">
+                <h3>Documentos para Pacientes Ambulatorios</h3>
+                <p>Genere una receta medica u orden de examenes sin crear una ficha clinica previa.</p>
+            </div>
+            <div class="card-ambulatorio-body">
+                <div class="form-grid">
+                    <div class="campo">
+                        <label for="amb-nombre">Nombre completo</label>
+                        <input id="amb-nombre" type="text" placeholder="Nombre del paciente">
+                    </div>
+                    <div class="campo">
+                        <label for="amb-rut">RUT</label>
+                        <input id="amb-rut" type="text" placeholder="Opcional">
+                    </div>
+                    <div class="campo">
+                        <label for="amb-edad">Edad</label>
+                        <input id="amb-edad" type="text" placeholder="Ej: 42">
+                    </div>
+                    <div class="campo">
+                        <label for="amb-correo">Correo electronico</label>
+                        <input id="amb-correo" type="email" placeholder="ejemplo@correo.com">
+                    </div>
+                    <div class="campo">
+                        <label for="amb-fecha">Fecha de nacimiento</label>
+                        <input id="amb-fecha" type="text" placeholder="Ej: 14/05/1983">
+                    </div>
+                    <div class="campo campo-completo">
+                        <label for="amb-direccion">Direccion</label>
+                        <input id="amb-direccion" type="text" placeholder="Opcional">
+                    </div>
+                </div>
+
+                <div class="tipo-documento">
+                    <button class="btn-ambulatorio" onclick="seleccionarDocumentoAmbulatorio('RECETA MEDICA')">Receta medica</button>
+                    <button class="btn-documentos" onclick="seleccionarDocumentoAmbulatorio('ORDEN DE EXAMENES')">Orden de examenes</button>
+                </div>
+
+                <div id="editor-ambulatorio" class="editor-ambulatorio">
+                    <h4 id="titulo-ambulatorio">Documento</h4>
+                    <textarea id="texto-ambulatorio" style="width:100%; height:220px; padding:10px; border-radius:8px; font-size:16px;" placeholder="Escriba las indicaciones aqui..."></textarea>
+                    <div id="checklist-examenes-ambulatorio" class="checklist-examenes">
+                        <h5>Seleccione los examenes solicitados</h5>
+                        <div class="lista-checks">
+                            <label class="item-check"><input type="checkbox" value="Orina completa">Orina completa</label>
+                            <label class="item-check"><input type="checkbox" value="Hemograma">Hemograma</label>
+                            <label class="item-check"><input type="checkbox" value="Uroanalisis">Uroanalisis</label>
+                            <label class="item-check"><input type="checkbox" value="Urocultivo">Urocultivo</label>
+                            <label class="item-check"><input type="checkbox" value="Perfil bioquimico">Perfil bioquimico</label>
+                            <label class="item-check"><input type="checkbox" value="Creatinina">Creatinina</label>
+                            <label class="item-check"><input type="checkbox" value="BUN">BUN</label>
+                            <label class="item-check"><input type="checkbox" value="PCR">PCR</label>
+                            <label class="item-check"><input type="checkbox" value="VHS">VHS</label>
+                            <label class="item-check"><input type="checkbox" value="Electrolitos plasmaticos">Electrolitos plasmaticos</label>
+                        </div>
+                        <div class="campo" style="margin-top:14px;">
+                            <label for="otros-examenes-ambulatorio">Otros examenes</label>
+                            <textarea id="otros-examenes-ambulatorio" style="min-height:100px;" placeholder="Agregue otros examenes, uno por linea o separados por coma."></textarea>
+                        </div>
+                    </div>
+                    <div class="acciones-ambulatorio">
+                        <button class="btn-guardar" onclick="previsualizarAmbulatorio()">Ver vista previa</button>
+                        <button class="btn-volver" onclick="limpiarAmbulatorio()">Limpiar</button>
+                    </div>
+                </div>
+
+                <div id="previa-ambulatorio">
+                    <p style="color:#e67e22; font-weight:bold; margin-bottom:15px;">Vista previa del documento:</p>
+                    <div id="visualizador-hoja-ambulatorio"></div>
+                    <div id="area-impresion-ambulatorio">
+                        <div class="hoja-doc">
+                            <div class="franja-doc"></div>
+                            <div class="header-receta">
+                                <div class="marca-medica">
+                                    <h2 id="medico-nombre-header">Dr. Nikolaus Vivallo</h2>
+                                    <p id="medico-profesion-header">Medico Cirujano</p>
+                                </div>
+                                <div class="simbolo-medico" aria-hidden="true">+</div>
+                            </div>
+                            <div class="subtitulo-documento">
+                                <h3 id="tipo-doc-ambulatorio"></h3>
+                                <div class="fecha-emision-doc">Fecha: <span id="fecha-doc-ambulatorio"></span></div>
+                            </div>
+                            <div class="datos-paciente-doc">
+                                <div class="campo-linea"><span class="etiqueta">Paciente</span><span class="valor" id="paciente-ambulatorio-doc"></span></div>
+                                <div class="campo-linea"><span class="etiqueta">RUT</span><span class="valor" id="rut-ambulatorio-doc"></span></div>
+                                <div class="campo-linea"><span class="etiqueta">Nacimiento</span><span class="valor" id="fecha-nacimiento-ambulatorio-doc"></span></div>
+                                <div class="campo-linea"><span class="etiqueta">Edad</span><span class="valor" id="edad-ambulatorio-doc"></span></div>
+                                <div class="campo-linea" style="grid-column: 1 / -1;"><span class="etiqueta">Direccion</span><span class="valor" id="direccion-ambulatorio-doc"></span></div>
+                            </div>
+                            <div class="rx-linea">
+                                <div class="rx-marca" id="rx-marca-ambulatorio">Rx</div>
+                                <div id="contenido-ambulatorio-doc"></div>
+                            </div>
+                            <div class="footer-receta">
+                                <div class="medico-detalle">
+                                    <p>RUT: 19.456.116-4</p>
+                                    <p>Registro Nacional de Prestadores: 541933</p>
+                                </div>
+                                <div class="firma-area">
+                                    <div class="firma-linea"></div>
+                                    <p>Dr. Nikolaus Vivallo</p>
+                                    <p>Firma y timbre medico</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="acciones-ambulatorio" style="margin-top:18px;">
+                        <button class="btn-guardar" onclick="imprimirAmbulatorio()">Imprimir</button>
+                        <button class="btn-documentos" onclick="enviarDocumentoAmbulatorioPorCorreo()">Enviar por correo</button>
+                        <button class="btn-volver" onclick="volverAEditarAmbulatorio()">Editar</button>
+                    </div>
+                    <p id="estado-correo-ambulatorio" style="display:none; margin-top:12px; font-size:14px; color:#2c3e50;"></p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        localStorage.setItem("rol", "usuario");
+        const URL = CONFIG.API_URL;
+        let tipoDocumentoAmbulatorio = "";
+
+        function enviarDatosAppsScript(datos) {
+            const payload = JSON.stringify(datos);
+            if (navigator.sendBeacon) {
+                const blob = new Blob([payload], { type: "text/plain;charset=UTF-8" });
+                const ok = navigator.sendBeacon(URL, blob);
+                return ok ? Promise.resolve() : Promise.reject(new Error("No se pudo encolar el envio."));
+            }
+            return fetch(URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "text/plain;charset=UTF-8" },
+                body: payload
+            }).then(() => undefined);
+        }
+
+        function obtenerDatosAmbulatorio() {
+            return {
+                nombre: document.getElementById("amb-nombre").value.trim(),
+                rut: document.getElementById("amb-rut").value.trim(),
+                edad: document.getElementById("amb-edad").value.trim(),
+                correo: document.getElementById("amb-correo").value.trim(),
+                fechaNacimiento: document.getElementById("amb-fecha").value.trim(),
+                direccion: document.getElementById("amb-direccion").value.trim()
+            };
+        }
+
+        function obtenerContenidoAmbulatorio() {
+            const esReceta = tipoDocumentoAmbulatorio === "RECETA MEDICA";
+            const texto = document.getElementById("texto-ambulatorio").value.trim();
+            const examenes = esReceta ? [] : obtenerExamenesAmbulatorios();
+            return {
+                esReceta,
+                examenes,
+                contenido: esReceta ? texto : examenes.map(item => `[x] ${item}`).join("\n")
+            };
+        }
+
+        function seleccionarDocumentoAmbulatorio(tipo) {
+            tipoDocumentoAmbulatorio = tipo;
+            const esReceta = tipo === "RECETA MEDICA";
+            document.getElementById("editor-ambulatorio").style.display = "block";
+            document.getElementById("previa-ambulatorio").style.display = "none";
+            document.getElementById("titulo-ambulatorio").innerText = tipo;
+            document.getElementById("texto-ambulatorio").style.display = esReceta ? "block" : "none";
+            document.getElementById("checklist-examenes-ambulatorio").style.display = esReceta ? "none" : "block";
+            document.getElementById("texto-ambulatorio").placeholder = esReceta
+                ? "Escriba cada medicamento con nombre, dosis, forma farmaceutica, concentracion y periodo de tratamiento."
+                : "Escriba las indicaciones aqui...";
+            if (!esReceta) limpiarChecklistAmbulatorio();
+        }
+
+        function limpiarChecklistAmbulatorio() {
+            document.querySelectorAll("#checklist-examenes-ambulatorio input[type='checkbox']").forEach(input => {
+                input.checked = false;
+            });
+            document.getElementById("otros-examenes-ambulatorio").value = "";
+        }
+
+        function obtenerExamenesAmbulatorios() {
+            const seleccionados = Array.from(document.querySelectorAll("#checklist-examenes-ambulatorio input[type='checkbox']:checked"))
+                .map(input => input.value.trim())
+                .filter(Boolean);
+            const otros = document.getElementById("otros-examenes-ambulatorio").value
+                .split(/\n|,/)
+                .map(item => item.trim())
+                .filter(Boolean);
+            return [...new Set([...seleccionados, ...otros])];
+        }
+
+        function renderizarExamenesAmbulatorios(examenes) {
+            const contenedor = document.getElementById("contenido-ambulatorio-doc");
+            contenedor.innerHTML = "";
+            const lista = document.createElement("div");
+            lista.className = "lista-examenes-impresion";
+
+            examenes.forEach(examen => {
+                const fila = document.createElement("div");
+                fila.className = "examen-item-impresion";
+
+                const casilla = document.createElement("span");
+                casilla.className = "examen-casilla";
+                casilla.textContent = "[x]";
+
+                const texto = document.createElement("span");
+                texto.className = "examen-texto";
+                texto.textContent = examen;
+
+                fila.appendChild(casilla);
+                fila.appendChild(texto);
+                lista.appendChild(fila);
+            });
+
+            contenedor.appendChild(lista);
+        }
+
+        function previsualizarAmbulatorio() {
+            const datos = obtenerDatosAmbulatorio();
+            const nombre = datos.nombre;
+            const rut = datos.rut;
+            const edad = datos.edad;
+            const fechaNacimiento = datos.fechaNacimiento;
+            const direccion = datos.direccion;
+
+            if (!tipoDocumentoAmbulatorio) {
+                alert("Seleccione primero si desea generar una receta medica o una orden de examenes.");
+                return;
+            }
+
+            if (!nombre) {
+                alert("Ingrese al menos el nombre del paciente.");
+                return;
+            }
+
+            const documento = obtenerContenidoAmbulatorio();
+            const esReceta = documento.esReceta;
+            const examenes = documento.examenes;
+            const contenido = documento.contenido;
+
+            if (!contenido) {
+                alert(esReceta ? "Escriba el contenido de la receta." : "Seleccione al menos un examen o agregue uno en 'Otros examenes'.");
+                return;
+            }
+
+            document.getElementById("tipo-doc-ambulatorio").innerText = tipoDocumentoAmbulatorio;
+            document.getElementById("fecha-doc-ambulatorio").innerText = new Date().toLocaleDateString("es-CL");
+            document.getElementById("paciente-ambulatorio-doc").innerText = nombre;
+            document.getElementById("rut-ambulatorio-doc").innerText = rut || "No registrado";
+            document.getElementById("fecha-nacimiento-ambulatorio-doc").innerText = fechaNacimiento || "No registrada";
+            document.getElementById("edad-ambulatorio-doc").innerText = edad || "No registrada";
+            document.getElementById("direccion-ambulatorio-doc").innerText = direccion || "No registrada";
+            document.getElementById("rx-marca-ambulatorio").style.display = esReceta ? "block" : "none";
+
+            if (esReceta) {
+                document.getElementById("contenido-ambulatorio-doc").innerText = contenido;
+            } else {
+                renderizarExamenesAmbulatorios(examenes);
+            }
+
+            document.getElementById("previa-ambulatorio").style.display = "block";
+            document.getElementById("editor-ambulatorio").style.display = "none";
+            document.getElementById("area-impresion-ambulatorio").style.display = "none";
+            renderizarVistaPreviaAmbulatoria();
+            document.getElementById("estado-correo-ambulatorio").style.display = "none";
+        }
+
+        function volverAEditarAmbulatorio() {
+            document.getElementById("previa-ambulatorio").style.display = "none";
+            document.getElementById("editor-ambulatorio").style.display = "block";
+            document.getElementById("area-impresion-ambulatorio").style.display = "none";
+            document.getElementById("visualizador-hoja-ambulatorio").innerHTML = "";
+        }
+
+        function limpiarAmbulatorio() {
+            document.getElementById("amb-nombre").value = "";
+            document.getElementById("amb-rut").value = "";
+            document.getElementById("amb-edad").value = "";
+            document.getElementById("amb-correo").value = "";
+            document.getElementById("amb-fecha").value = "";
+            document.getElementById("amb-direccion").value = "";
+            document.getElementById("texto-ambulatorio").value = "";
+            document.getElementById("contenido-ambulatorio-doc").innerHTML = "";
+            document.getElementById("editor-ambulatorio").style.display = "none";
+            document.getElementById("previa-ambulatorio").style.display = "none";
+            document.getElementById("area-impresion-ambulatorio").style.display = "none";
+            document.getElementById("visualizador-hoja-ambulatorio").innerHTML = "";
+            document.getElementById("estado-correo-ambulatorio").style.display = "none";
+            tipoDocumentoAmbulatorio = "";
+            limpiarChecklistAmbulatorio();
+        }
+
+        function enviarDocumentoAmbulatorioPorCorreo() {
+            const datos = obtenerDatosAmbulatorio();
+            const correo = datos.correo;
+            const estado = document.getElementById("estado-correo-ambulatorio");
+
+            if (!correo) {
+                alert("Ingrese un correo electronico para enviar el documento.");
+                return;
+            }
+
+            if (!tipoDocumentoAmbulatorio) {
+                alert("Primero genere una receta medica u orden de examenes.");
+                return;
+            }
+
+            const documento = obtenerContenidoAmbulatorio();
+            if (!documento.contenido) {
+                alert("No hay contenido para enviar.");
+                return;
+            }
+
+            estado.style.display = "block";
+            estado.style.color = "#2c3e50";
+            estado.innerText = "Enviando correo...";
+
+            const htmlDocumento = construirHtmlDocumentoCorreo();
+
+            enviarDatosAppsScript({
+                accion: "enviarDocumentoCorreo",
+                tipo: tipoDocumentoAmbulatorio,
+                nombre: datos.nombre,
+                rut: datos.rut,
+                edad: datos.edad,
+                fechaNacimiento: datos.fechaNacimiento,
+                direccion: datos.direccion,
+                correo: correo,
+                contenido: documento.contenido,
+                htmlDocumento: htmlDocumento
+            })
+            .then(() => {
+                estado.style.color = "#27ae60";
+                estado.innerText = "Solicitud de envio enviada. Si no llega el correo, revise la autorizacion y los logs de Apps Script.";
+            })
+            .catch(err => {
+                estado.style.color = "#c0392b";
+                estado.innerText = "No se pudo enviar el correo: " + err;
+            });
+        }
+
+        function imprimirAmbulatorio() {
+            const htmlDocumento = construirHtmlDocumentoCorreo();
+            if (!htmlDocumento) {
+                alert("Primero genere la vista previa del documento.");
+                return;
+            }
+
+            const popup = window.open("", "_blank", "width=900,height=1200");
+            if (!popup) {
+                alert("El navegador bloqueo la ventana de impresion. Permita ventanas emergentes e intente nuevamente.");
+                return;
+            }
+
+            popup.document.open();
+            popup.document.write(htmlDocumento);
+            popup.document.close();
+            popup.focus();
+
+            setTimeout(() => {
+                popup.print();
+                popup.close();
+            }, 300);
+        }
+
+        function construirHtmlDocumentoCorreo() {
+            const area = document.getElementById("area-impresion-ambulatorio");
+            if (!area) return "";
+            const estilosLocales = Array.from(document.querySelectorAll("style"))
+                .map(style => quitarMediaPrint(style.innerHTML))
+                .join("\n");
+
+            return `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        ${estilosLocales}
+        body {
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        #area-impresion-ambulatorio {
+            display: block !important;
+            margin: 0 auto !important;
+            box-shadow: none !important;
+            border: none !important;
+            width: 140mm !important;
+            min-height: 198mm !important;
+        }
+        @page {
+            size: A5 portrait;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>${area.outerHTML}</body>
+</html>`;
+        }
+
+        function renderizarVistaPreviaAmbulatoria() {
+            const htmlDocumento = construirHtmlDocumentoCorreo();
+            const visualizador = document.getElementById("visualizador-hoja-ambulatorio");
+            visualizador.innerHTML = "";
+            if (!htmlDocumento) return;
+
+            const iframe = document.createElement("iframe");
+            iframe.setAttribute("title", "Vista previa del documento ambulatorio");
+            iframe.srcdoc = htmlDocumento;
+            visualizador.appendChild(iframe);
+        }
+
+        function quitarMediaPrint(css) {
+            const patron = "@media print";
+            let resultado = "";
+            let indice = 0;
+
+            while (indice < css.length) {
+                const inicio = css.indexOf(patron, indice);
+                if (inicio === -1) {
+                    resultado += css.slice(indice);
+                    break;
+                }
+
+                resultado += css.slice(indice, inicio);
+
+                let abre = css.indexOf("{", inicio);
+                if (abre === -1) break;
+
+                let nivel = 1;
+                let cursor = abre + 1;
+                while (cursor < css.length && nivel > 0) {
+                    if (css[cursor] === "{") nivel++;
+                    if (css[cursor] === "}") nivel--;
+                    cursor++;
+                }
+
+                indice = cursor;
+            }
+
+            return resultado;
+        }
+    </script>
+</body>
+</html>
