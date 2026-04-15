@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evolucion Inicial</title>
+  <link rel="stylesheet" href="estilos.css">
+  <style>
+    .box{background:#fff;border:1px solid #dfe6ec;border-radius:12px;padding:16px;margin-bottom:16px}
+    .paciente-box{background:#f8f9fa;border-left:8px solid #27ae60}
+    .datos-secundarios{font-size:14px;color:#7f8c8d;line-height:1.6}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .campo{margin-bottom:12px}
+    .campo label{display:block;font-weight:600;margin-bottom:6px;color:#2c3e50}
+    .campo input,.campo select,.campo textarea{width:100%;padding:10px;border:1px solid #ccd6dd;border-radius:8px;box-sizing:border-box;font:inherit}
+    .campo textarea{min-height:84px;resize:vertical}
+    .fila{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+    .fila strong{min-width:140px;color:#2c3e50}
+    .fila label{display:inline-flex;align-items:center;gap:6px}
+    .sub{background:#fafcfd;border:1px solid #e6edf2;border-radius:10px;padding:12px;margin-top:12px}
+    .oculto{display:none}
+    .badge{display:inline-block;background:#eef4f7;border-radius:999px;padding:6px 10px;font-size:13px;font-weight:600;color:#2c3e50;margin:4px 8px 0 0}
+    #resultado{min-height:240px}
+    @media (max-width:760px){.grid,.grid3{grid-template-columns:1fr}.fila strong{min-width:100%}}
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <a href="index.html" style="text-decoration:none;display:flex;align-items:center;gap:10px;">
+      <img src="logo-brasil.png" alt="Logo Brasil" style="height:50px;cursor:pointer;">
+      <h1 style="color:white;margin:0;">Dr.Vivallo</h1>
+    </a>
+  </header>
+
+  <div class="main-content">
+    <button class="btn-volver" onclick="window.location.href='pacientes.html'">Volver al Historial</button>
+    <hr>
+
+    <div class="box paciente-box">
+      <strong>Ficha de atencion:</strong>
+      <div id="nombre-paciente" style="font-size:22px;color:#2c3e50;font-weight:bold;">Cargando nombre...</div>
+      <div id="detalles-paciente" class="datos-secundarios">Buscando datos del paciente...</div>
+    </div>
+
+    <div class="box">
+      <h3>Evolucion Inicial</h3>
+      <div class="grid">
+        <div class="campo">
+          <label for="motivo">Motivo de consulta</label>
+          <textarea id="motivo"></textarea>
+        </div>
+        <div>
+          <div class="campo">
+            <label for="morbidos">Antecedentes morbidos</label>
+            <textarea id="morbidos"></textarea>
+          </div>
+          <div class="campo">
+            <label for="quirurgicos">Antecedentes quirurgicos</label>
+            <textarea id="quirurgicos"></textarea>
+          </div>
+          <div class="fila">
+            <strong>Alergias</strong>
+            <label><input type="radio" name="alergias" value="Si">Si</label>
+            <label><input type="radio" name="alergias" value="No">No</label>
+          </div>
+          <div id="alergias_box" class="campo oculto">
+            <label for="alergias_detalle">Detalle alergia</label>
+            <input id="alergias_detalle" placeholder="Ej: Penicilina">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <h3>Signos Vitales</h3>
+      <div class="grid3">
+        <div class="campo"><label for="fc">FC</label><input type="number" id="fc" min="0"></div>
+        <div class="campo"><label for="pas">PA sistolica</label><input type="number" id="pas" min="0"></div>
+        <div class="campo"><label for="pad">PA diastolica</label><input type="number" id="pad" min="0"></div>
+        <div class="campo"><label for="sat">SatO2</label><input type="number" id="sat" min="0" max="100"></div>
+        <div class="campo">
+          <label for="fio2_tipo">FiO2</label>
+          <select id="fio2_tipo">
+            <option value="">Seleccionar</option>
+            <option value="Aire ambiental">Aire ambiental</option>
+            <option value="Dispositivo">Con dispositivo</option>
+          </select>
+        </div>
+        <div id="fio2_box" class="campo oculto"><label for="fio2_detalle">Detalle dispositivo</label><input id="fio2_detalle" placeholder="Ej: Naricera 2 LTS"></div>
+      </div>
+      <div>
+        <span class="badge" id="fc_estado">FC: pendiente</span>
+        <span class="badge" id="pa_estado">PA: pendiente</span>
+        <span class="badge" id="hde_estado">HDE: pendiente</span>
+      </div>
+    </div>
+
+    <div class="box">
+      <h3>Abdomen</h3>
+      <div class="fila"><strong>Blando</strong><label><input type="radio" name="abd_blando" value="Si">Si</label><label><input type="radio" name="abd_blando" value="No">No</label></div>
+      <div class="fila"><strong>Depresible</strong><label><input type="radio" name="abd_depresible" value="Si">Si</label><label><input type="radio" name="abd_depresible" value="No">No</label></div>
+      <div class="fila"><strong>Indoloro</strong><label><input type="radio" name="abd_indoloro" value="Si">Si</label><label><input type="radio" name="abd_indoloro" value="No">No</label></div>
+      <div class="fila"><strong>Masas palpables</strong><label><input type="radio" name="abd_masas" value="Si">Si</label><label><input type="radio" name="abd_masas" value="No">No</label></div>
+      <div id="abd_masas_box" class="campo oculto"><label for="abd_lugar">Lugar de la masa palpable</label><input id="abd_lugar" placeholder="Ej: Fosa iliaca derecha"></div>
+    </div>
+
+    <div class="box">
+      <h3>Examen Fisico</h3>
+      <div class="campo"><label for="examen">Observaciones</label><textarea id="examen"></textarea></div>
+    </div>
+
+    <div class="box">
+      <h3>Genitales</h3>
+      <div class="fila"><strong>Globo vesical</strong><label><input type="radio" name="globo" value="Si">Si</label><label><input type="radio" name="globo" value="No">No</label></div>
+      <div class="fila"><strong>Presenta Foley</strong><label><input type="radio" name="foley" value="Si">Si</label><label><input type="radio" name="foley" value="No">No</label></div>
+      <div id="foley_box" class="sub oculto">
+        <div class="grid3">
+          <div class="campo"><label for="foley_fr">French (FR)</label><input type="number" id="foley_fr" min="0"></div>
+          <div class="campo"><label for="foley_lumenes">Lumenes</label><select id="foley_lumenes"><option value=""></option><option>2 lumenes</option><option>3 lumenes</option></select></div>
+          <div class="campo"><label for="foley_contenido">Contenido</label><select id="foley_contenido"><option value=""></option><option>Hematico</option><option>Coluria</option><option>Ambar</option><option>Normal</option><option>Orina purpura</option></select></div>
+        </div>
+        <div class="grid">
+          <div class="fila"><strong>En situ</strong><label><input type="radio" name="foley_situ" value="Si">Si</label><label><input type="radio" name="foley_situ" value="No">No</label></div>
+          <div class="campo"><label for="foley_aspecto">Aspecto</label><select id="foley_aspecto"><option value=""></option><option>Limpida</option><option>Turbia</option><option>Sedimento</option><option>Fetida</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <h3>Drenajes</h3>
+      <div class="fila"><strong>Presenta drenajes</strong><label><input type="radio" name="drenajes" value="Si">Si</label><label><input type="radio" name="drenajes" value="No">No</label></div>
+      <div id="drenajes_box" class="sub oculto">
+        <div class="grid3">
+          <div class="campo"><label for="d_tipo">Tipo</label><input id="d_tipo"></div>
+          <div class="campo"><label for="d_contenido">Contenido</label><input id="d_contenido"></div>
+          <div class="fila"><strong>Aspirativo</strong><label><input type="radio" name="d_asp" value="Si">Si</label><label><input type="radio" name="d_asp" value="No">No</label></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <h3>Debito o Balance</h3>
+      <div class="grid">
+        <div class="sub" style="margin-top:0">
+          <h4>Foley</h4>
+          <div class="grid3">
+            <div class="campo"><label for="f_ml">ML en 24 horas</label><input type="number" id="f_ml" min="0"></div>
+            <div class="campo"><label>Periodo</label><input value="24 horas" readonly></div>
+            <div class="campo"><label for="f_mlhr">ML/hr</label><input id="f_mlhr" readonly></div>
+          </div>
+        </div>
+        <div class="sub" style="margin-top:0">
+          <h4>Drenajes</h4>
+          <div class="grid3">
+            <div class="campo"><label for="d_ml">ML en 24 horas</label><input type="number" id="d_ml" min="0"></div>
+            <div class="campo"><label>Periodo</label><input value="24 horas" readonly></div>
+            <div class="campo"><label for="d_mlhr">ML/hr</label><input id="d_mlhr" readonly></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <h3>Resumen Clinico Generado</h3>
+      <textarea id="resultado" class="textarea-evolucion"></textarea>
+    </div>
+
+    <button class="btn-guardar" onclick="guardarEvolucion()">Guardar en Ficha Clinica</button>
+    <br><br>
+    <button onclick="window.history.back()" style="background:none;border:none;color:#7f8c8d;cursor:pointer;text-decoration:underline;">Cancelar y volver</button>
+  </div>
+
+  <script src="url.js"></script>
+  <script>
+    const URL = CONFIG.API_URL;
+    const pacienteActual = localStorage.getItem("pacienteActual");
+    let resumenEditadoManualmente = false;
+    let edadPaciente = "N/A";
+
+    function normalizarFechaInput(valor){
+      if(!valor) return "";
+      if(typeof valor === "string"){
+        if(/^\d{4}-\d{2}-\d{2}$/.test(valor)) return valor;
+        if(/^\d{4}-\d{2}-\d{2}T/.test(valor)) return valor.slice(0,10);
+        if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(valor)){
+          const [dia, mes, anio] = valor.split("/");
+          return `${anio}-${mes.padStart(2,"0")}-${dia.padStart(2,"0")}`;
+        }
+      }
+      const fecha = new Date(valor);
+      if(Number.isNaN(fecha.getTime())) return "";
+      const anio = fecha.getFullYear();
+      const mes = String(fecha.getMonth()+1).padStart(2,"0");
+      const dia = String(fecha.getDate()).padStart(2,"0");
+      return `${anio}-${mes}-${dia}`;
+    }
+
+    function formatearFechaNacimiento(valor){
+      const fechaIso = normalizarFechaInput(valor);
+      if(!fechaIso) return "N/A";
+      const [anio, mes, dia] = fechaIso.split("-");
+      return `${dia}/${mes}/${anio}`;
+    }
+
+    function calcularEdadDesdeFecha(valor){
+      const fechaIso = normalizarFechaInput(valor);
+      if(!fechaIso) return "N/A";
+      const [anio, mes, dia] = fechaIso.split("-").map(Number);
+      const hoy = new Date();
+      let edad = hoy.getFullYear() - anio;
+      const mesActual = hoy.getMonth() + 1;
+      const diaActual = hoy.getDate();
+      if(mesActual < mes || (mesActual === mes && diaActual < dia)) edad--;
+      return edad >= 0 ? String(edad) : "N/A";
+    }
+
+    const radio = n => document.querySelector(`input[name="${n}"]:checked`)?.value || "";
+    const txt = id => document.getElementById(id).value.trim();
+    const na = v => v || "N/A";
+    const tieneValor = v => String(v ?? "").trim() !== "";
+    const agregarLinea = (arr, etiqueta, valor) => {
+      if (tieneValor(valor)) arr.push(`${etiqueta}: ${valor}.`);
+    };
+    const agregarSeccion = (arr, titulo, lineas) => {
+      const lineasValidas = lineas.filter(Boolean);
+      if (!lineasValidas.length) return;
+      if (arr.length) arr.push("");
+      arr.push(titulo);
+      arr.push(...lineasValidas);
+    };
+
+    function fcEstado(v){const n=Number(v);if(!n)return "";if(n<60)return `Bradicardico (${n})`;if(n>100)return `Taquicardico (${n})`;return `Normocardico (${n})`;}
+    function paEstado(s,d){s=Number(s);d=Number(d);if(!s||!d)return "";if(s>180||d>120)return `Crisis hipertensiva (${s}/${d} mmHg)`;if(s>=140||d>=90)return `HTA nivel 2 (${s}/${d} mmHg)`;if((s>=130&&s<=139)||(d>=80&&d<=89))return `HTA nivel 1 (${s}/${d} mmHg)`;if(s>=120&&s<=129&&d<80)return `Presion elevada (${s}/${d} mmHg)`;if(s<120&&d<80)return `Normal (${s}/${d} mmHg)`;return `${s}/${d} mmHg`;}
+    function hde(){const fc=Number(txt("fc")),s=Number(txt("pas")),d=Number(txt("pad")),sat=Number(txt("sat"));if(!fc||!s||!d||!sat)return "";return fc>=60&&fc<=100&&s<140&&d<90&&sat>=96?"Hemodinamicamente estable (HDE)":"No HDE";}
+    function calc24h(mlId,outId){const ml=Number(txt(mlId)),o=document.getElementById(outId);if(!ml){o.value="";return "";}const r=(ml/24).toFixed(2);o.value=r;return r;}
+
+    function actualizarUI(){
+      document.getElementById("alergias_box").classList.toggle("oculto", radio("alergias") !== "Si");
+      document.getElementById("fio2_box").classList.toggle("oculto", txt("fio2_tipo") !== "Dispositivo");
+      document.getElementById("abd_masas_box").classList.toggle("oculto", radio("abd_masas") !== "Si");
+      document.getElementById("foley_box").classList.toggle("oculto", radio("foley") !== "Si");
+      document.getElementById("drenajes_box").classList.toggle("oculto", radio("drenajes") !== "Si");
+      document.getElementById("fc_estado").textContent = "FC: " + (fcEstado(txt("fc")) || "pendiente");
+      document.getElementById("pa_estado").textContent = "PA: " + (paEstado(txt("pas"), txt("pad")) || "pendiente");
+      document.getElementById("hde_estado").textContent = "HDE: " + (hde() || "pendiente");
+    }
+
+    function construirResumen(){
+      const fio2 = txt("fio2_tipo")==="Dispositivo" ? `Dispositivo (${na(txt("fio2_detalle"))})` : txt("fio2_tipo");
+      const fMlHr = calc24h("f_ml","f_mlhr");
+      const dMlHr = calc24h("d_ml","d_mlhr");
+      const resumen = ["EVOLUCION INICIAL"];
+      const encabezado = [];
+
+      if (tieneValor(pacienteActual)) encabezado.push(`Nombre paciente: ${pacienteActual}.`);
+      if (tieneValor(edadPaciente) && edadPaciente !== "N/A") encabezado.push(`Edad: ${edadPaciente}.`);
+      agregarLinea(encabezado, "Motivo de consulta", txt("motivo"));
+      agregarLinea(encabezado, "Antecedentes morbidos", txt("morbidos"));
+      agregarLinea(encabezado, "Antecedentes quirurgicos", txt("quirurgicos"));
+
+      if (radio("alergias") === "Si" && tieneValor(txt("alergias_detalle"))) {
+        encabezado.push(`Alergias: ${txt("alergias_detalle")}.`);
+      } else if (radio("alergias") === "No") {
+        encabezado.push("Alergias: No.");
+      }
+
+      if (encabezado.length) {
+        resumen.push(...encabezado);
+      }
+
+      const signos = [];
+      if (tieneValor(txt("fc"))) agregarLinea(signos, "FC", fcEstado(txt("fc")) || txt("fc"));
+      if (tieneValor(txt("pas")) && tieneValor(txt("pad"))) agregarLinea(signos, "PA", paEstado(txt("pas"), txt("pad")) || `${txt("pas")}/${txt("pad")} mmHg`);
+      if (tieneValor(txt("sat"))) agregarLinea(signos, "SatO2", `${txt("sat")}%`);
+      if (tieneValor(txt("fio2_tipo"))) agregarLinea(signos, "FiO2", fio2);
+      if ((tieneValor(txt("fc")) || tieneValor(txt("pas")) || tieneValor(txt("pad")) || tieneValor(txt("sat"))) && hde()) {
+        agregarLinea(signos, "Estado hemodinamico", hde());
+      }
+      agregarSeccion(resumen, "Signos vitales:", signos);
+
+      const abdomen = [];
+      const abdomenBasico = [
+        radio("abd_blando") ? `Blando: ${radio("abd_blando")}` : "",
+        radio("abd_depresible") ? `Depresible: ${radio("abd_depresible")}` : "",
+        radio("abd_indoloro") ? `Indoloro: ${radio("abd_indoloro")}` : ""
+      ].filter(Boolean).join(". ");
+      if (abdomenBasico) abdomen.push(`${abdomenBasico}.`);
+      if (radio("abd_masas") === "Si") {
+        abdomen.push(`Masas palpables: Si${txt("abd_lugar") ? ", lugar: " + txt("abd_lugar") : ""}.`);
+      } else if (radio("abd_masas") === "No") {
+        abdomen.push("Masas palpables: No.");
+      }
+      agregarSeccion(resumen, "Abdomen:", abdomen);
+
+      const examen = txt("examen");
+      agregarSeccion(resumen, "Examen fisico:", examen ? [`${examen}.`] : []);
+
+      const genitales = [];
+      if (radio("globo")) genitales.push(`Globo vesical: ${radio("globo")}.`);
+      if (radio("foley")) genitales.push(`Foley: ${radio("foley")}.`);
+      if (radio("foley") === "Si") {
+        const detallesFoley = [
+          radio("foley_situ") ? `Foley en situ: ${radio("foley_situ")}` : "",
+          txt("foley_fr") ? `FR: ${txt("foley_fr")}` : "",
+          txt("foley_lumenes") ? `Lumenes: ${txt("foley_lumenes")}` : "",
+          txt("foley_contenido") ? `Contenido: ${txt("foley_contenido")}` : "",
+          txt("foley_aspecto") ? `Aspecto: ${txt("foley_aspecto")}` : ""
+        ].filter(Boolean).join(". ");
+        if (detallesFoley) genitales.push(`${detallesFoley}.`);
+      }
+      agregarSeccion(resumen, "Genitales:", genitales);
+
+      const drenajes = [];
+      if (radio("drenajes")) drenajes.push(`Presenta drenajes: ${radio("drenajes")}.`);
+      if (radio("drenajes") === "Si") {
+        const detallesDrenaje = [
+          txt("d_tipo") ? `Tipo: ${txt("d_tipo")}` : "",
+          txt("d_contenido") ? `Contenido: ${txt("d_contenido")}` : "",
+          radio("d_asp") ? `Aspirativo: ${radio("d_asp")}` : ""
+        ].filter(Boolean).join(". ");
+        if (detallesDrenaje) drenajes.push(`${detallesDrenaje}.`);
+      }
+      agregarSeccion(resumen, "Drenajes:", drenajes);
+
+      const balance = [];
+      if (txt("f_ml") || fMlHr) balance.push(`Foley: ${na(txt("f_ml"))} ml en 24 horas. Calculo: ${na(fMlHr)} ml/hr.`);
+      if (txt("d_ml") || dMlHr) balance.push(`Drenajes: ${na(txt("d_ml"))} ml en 24 horas. Calculo: ${na(dMlHr)} ml/hr.`);
+      agregarSeccion(resumen, "Debito o balance:", balance);
+
+      return resumen.join("\n");
+    }
+
+    function sync(){if(resumenEditadoManualmente)return;actualizarUI();document.getElementById("resultado").value=construirResumen();}
+
+    function cargarDatosPaciente(){
+      fetch(URL).then(r=>r.json()).then(data=>{
+        const registro = data.find(fila => fila[1] === pacienteActual);
+        if(registro){
+          const fechaNacimiento = formatearFechaNacimiento(registro[3]);
+          edadPaciente = registro[4] || calcularEdadDesdeFecha(registro[3]);
+          document.getElementById("detalles-paciente").innerHTML = `<b>RUT:</b> ${registro[2] || "N/A"} | <b>Fecha de nacimiento:</b> ${fechaNacimiento} <br><b>Edad:</b> ${edadPaciente} anos | <b>Direccion:</b> ${registro[5] || "N/A"}`;
+          sync();
+        } else {
+          document.getElementById("detalles-paciente").innerText = "No se encontraron datos basicos del paciente.";
+        }
+      }).catch(()=>{
+        document.getElementById("detalles-paciente").innerText = "Error de conexion con la base de datos.";
+      });
+    }
+
+    function enviarDatosAppsScript(datos){
+      const payload = JSON.stringify(datos);
+      if(navigator.sendBeacon){
+        const blob = new Blob([payload], { type: "text/plain;charset=UTF-8" });
+        const ok = navigator.sendBeacon(URL, blob);
+        return ok ? Promise.resolve() : Promise.reject(new Error("No se pudo encolar el envio."));
+      }
+      return fetch(URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:payload}).then(()=>undefined);
+    }
+
+    function guardarEvolucion(){
+      const evolucion = document.getElementById("resultado").value.trim();
+      if(!evolucion || evolucion === "EVOLUCION INICIAL"){ alert("Completa la evolucion inicial antes de guardar."); return; }
+      const btn = document.querySelector(".btn-guardar");
+      btn.innerText = "Guardando en ficha...";
+      btn.disabled = true;
+      enviarDatosAppsScript({ nombre: pacienteActual, accion: "guardarEvolucion", evolucion })
+        .then(()=>{ alert("Evolucion guardada correctamente."); window.location.href = "pacientes.html"; })
+        .catch(err=>{ alert("Error al guardar: " + err); btn.innerText = "Guardar en Ficha Clinica"; btn.disabled = false; });
+    }
+
+    if(!pacienteActual){ alert("Error: No se ha seleccionado un paciente."); window.location.href = "pacientes.html"; }
+    else { document.getElementById("nombre-paciente").innerText = pacienteActual; cargarDatosPaciente(); }
+
+    document.querySelectorAll("input,select,textarea").forEach(el=>{
+      if(el.id === "resultado") return;
+      el.addEventListener("input", ()=>{ resumenEditadoManualmente = false; sync(); });
+      el.addEventListener("change", ()=>{ resumenEditadoManualmente = false; sync(); });
+    });
+    document.getElementById("resultado").addEventListener("input", ()=>{ resumenEditadoManualmente = true; });
+    sync();
+  </script>
+</body>
+</html>

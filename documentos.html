@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Documentos</title>
+    <link rel="stylesheet" href="estilos.css">
+    <style>
+        :root {
+            --verde-principal: #6fbf9d;
+            --verde-suave: #e6f5ed;
+            --verde-linea: #8cc7ab;
+            --verde-texto: #2f6b58;
+            --gris-texto: #4e6a61;
+        }
+        .selector-doc { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .btn-doc { padding: 20px; border-radius: 14px; border: 2px solid var(--verde-linea); background: linear-gradient(180deg, #ffffff 0%, #f4fbf7 100%); cursor: pointer; font-weight: bold; text-align: center; color: var(--verde-texto); }
+        .btn-doc:hover { background: #edf8f1; }
+        #contenedor-previa { display: none; margin-top: 20px; padding: 20px; background: #f9f9f9; border: 1px dashed #ccc; text-align: center; }
+        #area-impresion { display: none; background: linear-gradient(180deg, #f6fcf8 0%, #ffffff 18%); padding: 0; font-family: Georgia, "Times New Roman", serif; color: #000; text-align: left; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 148mm; min-height: 210mm; margin: 0 auto; box-sizing: border-box; overflow: hidden; border: 1px solid #dceee4; }
+        @page { size: A5 portrait; margin: 10mm; }
+        @media print {
+            @page { size: A5 portrait; margin: 10mm; }
+            html, body { width: 148mm; min-height: 210mm; margin: 0; padding: 0; }
+            body * { display: none !important; }
+            #area-impresion, #area-impresion * { display: block !important; }
+            #area-impresion { position: absolute; left: 0; top: 0; width: 148mm; min-height: 210mm; box-shadow: none; padding: 0; }
+        }
+        .hoja-doc { min-height: 210mm; padding: 12mm 12mm 10mm; position: relative; }
+        .franja-doc { height: 8mm; background: linear-gradient(90deg, var(--verde-principal) 0%, #bde3cf 100%); margin: 0 -12mm 8mm; }
+        .header-receta { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; padding-bottom: 6mm; border-bottom: 2px solid var(--verde-linea); margin-bottom: 6mm; }
+        .marca-medica h2 { margin: 0; font-size: 22px; color: var(--verde-texto); letter-spacing: 0.2px; }
+        .marca-medica p { margin: 3px 0 0; font-size: 11px; color: var(--gris-texto); letter-spacing: 2px; text-transform: uppercase; }
+        .simbolo-medico { font-size: 34px; line-height: 1; color: var(--verde-principal); font-weight: bold; }
+        .subtitulo-documento { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 5mm; }
+        .subtitulo-documento h3 { margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: 2.5px; color: var(--verde-texto); }
+        .fecha-emision-doc { font-size: 11px; color: var(--gris-texto); }
+        .datos-paciente { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-bottom: 7mm; }
+        .campo-linea { display: flex; align-items: flex-end; gap: 6px; min-width: 0; }
+        .campo-linea .etiqueta { font-size: 11px; color: var(--gris-texto); white-space: nowrap; }
+        .campo-linea .valor { flex: 1; min-height: 18px; border-bottom: 1px solid var(--verde-linea); font-size: 12px; color: #26473b; padding-bottom: 1px; }
+        .rx-linea { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6mm; }
+        .rx-marca { font-size: 30px; font-weight: bold; color: var(--verde-texto); line-height: 1; }
+        #contenido-doc { min-height: 86mm; font-size: 15px; line-height: 1.7; white-space: pre-wrap; color: #243d34; }
+        .checklist-examenes { display: none; margin-top: 14px; padding: 16px; border: 1px solid #d7e9df; border-radius: 12px; background: #f7fcf9; }
+        .checklist-examenes h4 { margin: 0 0 12px; color: var(--verde-texto); }
+        .lista-checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px 16px; }
+        .item-check { display: flex; align-items: center; gap: 8px; color: #26473b; font-size: 15px; }
+        .item-check input { width: 16px; height: 16px; accent-color: var(--verde-principal); }
+        .campo-otros { margin-top: 14px; }
+        .campo-otros label { display: block; margin-bottom: 6px; color: var(--verde-texto); font-weight: bold; }
+        .campo-otros textarea { width: 100%; min-height: 90px; padding: 10px; border-radius: 8px; border: 1px solid #c7ddd2; font-size: 15px; resize: vertical; box-sizing: border-box; }
+        .lista-examenes-impresion { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 18px; width: 100%; }
+        .examen-item-impresion { display: flex; align-items: flex-start; gap: 8px; break-inside: avoid; }
+        .examen-casilla { font-size: 14px; line-height: 1.3; margin-top: 1px; }
+        .examen-texto { flex: 1; white-space: normal; }
+        .footer-receta { margin-top: 18mm; padding-top: 8mm; border-top: 1px solid #d8e8df; display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; }
+        .firma-area { width: 42%; text-align: center; }
+        .firma-linea { border-top: 1px solid var(--verde-linea); margin-bottom: 6px; }
+        .firma-area p { margin: 0; font-size: 11px; color: var(--gris-texto); }
+        .medico-detalle { flex: 1; font-size: 11px; color: var(--gris-texto); }
+        .medico-detalle p { margin: 3px 0; }
+        @media (max-width: 700px) {
+            .selector-doc { grid-template-columns: 1fr; }
+            .datos-paciente { grid-template-columns: 1fr; }
+            .lista-checks,
+            .lista-examenes-impresion { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<header class="app-header">
+    <h1>Receta Simple</h1>
+</header>
+
+<div class="main-content">
+    <button class="btn-volver" onclick="window.location.href='pacientes.html'">Volver</button>
+    <div id="info-paciente-cabecera" style="margin: 20px 0; font-weight: bold; color: #2c3e50;">
+        Paciente: <strong id="nombre-display" style="color: #27ae60;">Cargando...</strong>
+    </div>
+
+    <div class="selector-doc" id="menu-inicial">
+        <div class="btn-doc" onclick="generar('RECETA MEDICA')">Generar Receta</div>
+        <div class="btn-doc" onclick="generar('ORDEN DE EXAMENES')">Orden de Examenes</div>
+    </div>
+
+    <div id="editor-documento" style="display:none; margin-top:20px;">
+        <h3 id="titulo-redaccion">Redactar</h3>
+        <textarea id="texto-doc" style="width:100%; height:220px; padding:10px; border-radius:8px; font-size:16px;" placeholder="Escriba las indicaciones aqui..."></textarea>
+        <div id="checklist-examenes" class="checklist-examenes">
+            <h4>Seleccione los examenes solicitados</h4>
+            <div class="lista-checks">
+                <label class="item-check"><input type="checkbox" value="Orina completa">Orina completa</label>
+                <label class="item-check"><input type="checkbox" value="Hemograma">Hemograma</label>
+                <label class="item-check"><input type="checkbox" value="Uroanalisis">Uroanalisis</label>
+                <label class="item-check"><input type="checkbox" value="Urocultivo">Urocultivo</label>
+                <label class="item-check"><input type="checkbox" value="Perfil bioquimico">Perfil bioquimico</label>
+                <label class="item-check"><input type="checkbox" value="Creatinina">Creatinina</label>
+                <label class="item-check"><input type="checkbox" value="BUN">BUN</label>
+                <label class="item-check"><input type="checkbox" value="PCR">PCR</label>
+                <label class="item-check"><input type="checkbox" value="VHS">VHS</label>
+                <label class="item-check"><input type="checkbox" value="Electrolitos plasmaticos">Electrolitos plasmaticos</label>
+            </div>
+            <div class="campo-otros">
+                <label for="otros-examenes">Otros examenes</label>
+                <textarea id="otros-examenes" placeholder="Agregue otros examenes, uno por linea o separados por coma."></textarea>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button id="btn-previa" class="btn-guardar" style="flex:2;" onclick="previsualizar()">Ver Vista Previa</button>
+            <button class="btn-volver" style="flex:1; margin:0; background:#95a5a6;" onclick="location.reload()">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="contenedor-previa">
+        <p style="color:#e67e22; font-weight:bold; margin-bottom:15px;">Vista previa del documento:</p>
+        <div id="visualizador-hoja"></div>
+        <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
+            <button class="btn-guardar" style="background:#27ae60; padding:15px 30px;" onclick="window.print()">Todo correcto, Imprimir</button>
+            <button class="btn-volver" style="background:#34495e;" onclick="volverAEditar()">Editar texto</button>
+        </div>
+        <p id="status-guardado" style="font-size:12px; color:#7f8c8d; margin-top:10px;">Guardando copia en historial...</p>
+    </div>
+</div>
+
+<div id="area-impresion">
+    <div class="hoja-doc">
+        <div class="franja-doc"></div>
+        <div class="header-receta">
+            <div class="marca-medica">
+                <h2 id="medico-nombre-header"></h2>
+                <p id="medico-profesion-header"></p>
+            </div>
+            <div class="simbolo-medico" aria-hidden="true">+</div>
+        </div>
+        <div class="subtitulo-documento">
+            <h3 id="tipo-doc-titulo"></h3>
+            <div class="fecha-emision-doc">Fecha: <span id="fecha-doc"></span></div>
+        </div>
+
+        <div class="datos-paciente">
+            <div class="campo-linea"><span class="etiqueta">Paciente</span><span class="valor" id="paciente-doc"></span></div>
+            <div class="campo-linea"><span class="etiqueta">RUT</span><span class="valor" id="rut-doc"></span></div>
+            <div class="campo-linea"><span class="etiqueta">Nacimiento</span><span class="valor" id="fecha-nacimiento-doc"></span></div>
+            <div class="campo-linea"><span class="etiqueta">Edad</span><span class="valor" id="edad-doc"></span></div>
+            <div class="campo-linea" style="grid-column: 1 / -1;"><span class="etiqueta">Direccion</span><span class="valor" id="direccion-doc"></span></div>
+        </div>
+
+        <div class="rx-linea">
+            <div class="rx-marca" id="rx-marca">Rx</div>
+            <div id="contenido-doc"></div>
+        </div>
+
+        <div class="footer-receta">
+            <div class="medico-detalle">
+                <p id="medico-rut-header"></p>
+                <p id="medico-registro-header"></p>
+            </div>
+            <div class="firma-area">
+                <div class="firma-linea"></div>
+                <p id="firma-medico-nombre"></p>
+                <p>Firma y timbre medico</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="url.js"></script>
+<script>
+const URL = CONFIG.API_URL;
+const pacienteActual = localStorage.getItem("pacienteActual");
+const DATOS_MEDICO = {
+    nombre: "Dr. Nikolaus Vivallo",
+    rut: "19.456.116-4",
+    profesion: "Medico Cirujano",
+    registro: "541933"
+};
+let datosCompletosPaciente = { rut: "", fechaNacimiento: "", edad: "", direccion: "", telefono: "", correo: "" };
+
+function normalizarFechaInput(valor) {
+    if (!valor) return "";
+    if (typeof valor === "string") {
+        if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) return valor;
+        if (/^\d{4}-\d{2}-\d{2}T/.test(valor)) return valor.slice(0, 10);
+        if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(valor)) {
+            const [dia, mes, anio] = valor.split("/");
+            return `${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
+        }
+    }
+    const fecha = new Date(valor);
+    if (Number.isNaN(fecha.getTime())) return "";
+    const anio = fecha.getFullYear();
+    const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+    const dia = String(fecha.getDate()).padStart(2, "0");
+    return `${anio}-${mes}-${dia}`;
+}
+
+function normalizarFecha(valor) {
+    if (!valor) return "";
+    if (typeof valor === "string" && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(valor)) return valor;
+    const fechaIso = normalizarFechaInput(valor);
+    if (!fechaIso) return valor;
+    const [anio, mes, dia] = fechaIso.split("-");
+    return `${dia}/${mes}/${anio}`;
+}
+
+function calcularEdadDesdeFecha(valor) {
+    if (!valor) return "";
+    const fechaIso = normalizarFechaInput(valor);
+    if (!fechaIso) return "";
+    const [anio, mes, dia] = fechaIso.split("-").map(Number);
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - anio;
+    const mesActual = hoy.getMonth() + 1;
+    const diaActual = hoy.getDate();
+    if (mesActual < mes || (mesActual === mes && diaActual < dia)) edad--;
+    return edad >= 0 ? String(edad) : "";
+}
+
+function normalizarFechaRegistro(valor) {
+    const fecha = new Date(valor);
+    return Number.isNaN(fecha.getTime()) ? new Date(0) : fecha;
+}
+
+function obtenerRegistrosPaciente(data, nombrePaciente) {
+    if (!Array.isArray(data)) return [];
+
+    return data
+        .map(fila => Array.isArray(fila) ? fila : [])
+        .filter(fila => (fila[1] || "").toString().trim() === nombrePaciente)
+        .map(fila => ({
+            fecha: normalizarFechaRegistro(fila[0]),
+            rut: (fila[2] || "").toString().trim(),
+            fechaNacimiento: (fila[3] || "").toString().trim(),
+            edad: (fila[4] || "").toString().trim(),
+            direccion: (fila[5] || "").toString().trim(),
+            telefono: (fila[6] || "").toString().trim(),
+            correo: (fila[7] || "").toString().trim()
+        }))
+        .sort((a, b) => a.fecha - b.fecha);
+}
+
+function enviarDatosAppsScript(datos) {
+    const payload = JSON.stringify(datos);
+
+    if (navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: "text/plain;charset=UTF-8" });
+        const enviado = navigator.sendBeacon(URL, blob);
+        return enviado ? Promise.resolve() : Promise.reject(new Error("No se pudo encolar el envio."));
+    }
+
+    return fetch(URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=UTF-8" },
+        body: payload
+    }).then(() => undefined);
+}
+
+if (!pacienteActual) window.location.href = "pacientes.html";
+document.getElementById("nombre-display").innerText = pacienteActual;
+fetch(URL)
+    .then(res => res.json())
+    .then(data => {
+        const registros = obtenerRegistrosPaciente(data, pacienteActual);
+        if (registros.length) {
+            const perfil = registros[0];
+            datosCompletosPaciente = {
+                rut: perfil.rut || "",
+                fechaNacimiento: perfil.fechaNacimiento || "",
+                edad: perfil.edad || "",
+                direccion: perfil.direccion || "",
+                telefono: perfil.telefono || "",
+                correo: perfil.correo || ""
+            };
+        }
+    })
+    .catch(err => {
+        console.error("No se pudieron cargar los datos del paciente:", err);
+    });
+
+function generar(tipo) {
+    const esReceta = tipo === "RECETA MEDICA";
+    document.getElementById("menu-inicial").style.display = "none";
+    document.getElementById("tipo-doc-titulo").innerText = tipo;
+    document.getElementById("titulo-redaccion").innerText = "Redactando " + tipo;
+    document.getElementById("editor-documento").style.display = "block";
+    document.getElementById("texto-doc").style.display = esReceta ? "block" : "none";
+    document.getElementById("checklist-examenes").style.display = esReceta ? "none" : "block";
+    document.getElementById("texto-doc").placeholder = esReceta
+        ? "Escriba cada medicamento con nombre, dosis, forma farmaceutica, concentracion y periodo de tratamiento."
+        : "Escriba las indicaciones aqui...";
+    if (esReceta) {
+        document.getElementById("texto-doc").focus();
+    } else {
+        limpiarChecklistExamenes();
+        document.getElementById("otros-examenes").focus();
+    }
+}
+
+function limpiarChecklistExamenes() {
+    document.querySelectorAll("#checklist-examenes input[type='checkbox']").forEach(input => {
+        input.checked = false;
+    });
+    document.getElementById("otros-examenes").value = "";
+}
+
+function obtenerExamenesSeleccionados() {
+    const seleccionados = Array.from(document.querySelectorAll("#checklist-examenes input[type='checkbox']:checked"))
+        .map(input => input.value.trim())
+        .filter(Boolean);
+    const otros = document.getElementById("otros-examenes").value
+        .split(/\n|,/)
+        .map(item => item.trim())
+        .filter(Boolean);
+
+    return [...new Set([...seleccionados, ...otros])];
+}
+
+function construirContenidoExamenes(examenes) {
+    return examenes.map(item => `[x] ${item}`).join("\n");
+}
+
+function renderizarExamenesEnVistaPrevia(examenes) {
+    const contenedor = document.getElementById("contenido-doc");
+    contenedor.innerHTML = "";
+
+    const lista = document.createElement("div");
+    lista.className = "lista-examenes-impresion";
+
+    examenes.forEach(examen => {
+        const fila = document.createElement("div");
+        fila.className = "examen-item-impresion";
+
+        const casilla = document.createElement("span");
+        casilla.className = "examen-casilla";
+        casilla.textContent = "[x]";
+
+        const texto = document.createElement("span");
+        texto.className = "examen-texto";
+        texto.textContent = examen;
+
+        fila.appendChild(casilla);
+        fila.appendChild(texto);
+        lista.appendChild(fila);
+    });
+
+    contenedor.appendChild(lista);
+}
+
+function previsualizar() {
+    const fechaNacimiento = normalizarFecha(datosCompletosPaciente.fechaNacimiento) || "No registrada";
+    const edad = datosCompletosPaciente.edad || calcularEdadDesdeFecha(datosCompletosPaciente.fechaNacimiento) || "No registrada";
+    const tipoDoc = document.getElementById("tipo-doc-titulo").innerText;
+    const esReceta = tipoDoc === "RECETA MEDICA";
+    const texto = document.getElementById("texto-doc").value.trim();
+    const examenes = esReceta ? [] : obtenerExamenesSeleccionados();
+    const contenido = esReceta ? texto : construirContenidoExamenes(examenes);
+
+    if (!contenido) {
+        return alert(esReceta ? "Por favor, escriba el contenido del documento." : "Seleccione al menos un examen o agregue uno en 'Otros examenes'.");
+    }
+
+    document.getElementById("paciente-doc").innerText = pacienteActual;
+    document.getElementById("rut-doc").innerText = datosCompletosPaciente.rut || "No registrado";
+    document.getElementById("fecha-nacimiento-doc").innerText = fechaNacimiento;
+    document.getElementById("edad-doc").innerText = edad;
+    document.getElementById("direccion-doc").innerText = datosCompletosPaciente.direccion || "No registrada";
+    document.getElementById("fecha-doc").innerText = new Date().toLocaleDateString("es-CL");
+    if (esReceta) {
+        document.getElementById("contenido-doc").innerText = contenido;
+    } else {
+        renderizarExamenesEnVistaPrevia(examenes);
+    }
+    document.getElementById("rx-marca").style.display = esReceta ? "block" : "none";
+
+    document.getElementById("medico-nombre-header").innerText = DATOS_MEDICO.nombre;
+    document.getElementById("medico-rut-header").innerText = "RUT: " + DATOS_MEDICO.rut;
+    document.getElementById("medico-profesion-header").innerText = DATOS_MEDICO.profesion;
+    document.getElementById("medico-registro-header").innerText = "Registro Nacional de Prestadores: " + DATOS_MEDICO.registro;
+    document.getElementById("firma-medico-nombre").innerText = DATOS_MEDICO.nombre;
+
+    document.getElementById("editor-documento").style.display = "none";
+    document.getElementById("contenedor-previa").style.display = "block";
+    document.getElementById("area-impresion").style.display = "block";
+
+    guardarCopiaAutomatica(contenido);
+}
+
+function guardarCopiaAutomatica(texto) {
+    const tipoDoc = document.getElementById("tipo-doc-titulo").innerText;
+    const statusMsg = document.getElementById("status-guardado");
+
+    const datos = {
+        nombre: pacienteActual,
+        accion: "guardarDocumento",
+        tipo: tipoDoc,
+        contenido: texto
+    };
+
+    enviarDatosAppsScript(datos)
+    .then(() => {
+        statusMsg.innerText = "Copia guardada en el historial del paciente.";
+        statusMsg.style.color = "#27ae60";
+    })
+    .catch(err => {
+        console.error("Error al guardar copia:", err);
+        statusMsg.innerText = "No se pudo guardar la copia en el historial.";
+        statusMsg.style.color = "#e74c3c";
+    });
+}
+
+function volverAEditar() {
+    document.getElementById("contenedor-previa").style.display = "none";
+    document.getElementById("area-impresion").style.display = "none";
+    document.getElementById("editor-documento").style.display = "block";
+    document.getElementById("status-guardado").innerText = "Guardando copia en historial...";
+    document.getElementById("status-guardado").style.color = "#7f8c8d";
+}
+</script>
+</body>
+</html>

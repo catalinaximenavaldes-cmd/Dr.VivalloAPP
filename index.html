@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="estilos.css">
+    <title>Nikolaus APP</title>
+    <style>
+        .menu-botones button {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-nuevo { background-color: #27ae60; color: white; }
+        .btn-activos { background-color: #3498db; color: white; }
+        .menu-botones button:hover { opacity: 0.9; transform: translateY(-2px); transition: 0.2s; }
+
+        @media (max-width: 640px) {
+            .menu-botones {
+                margin-top: 20px !important;
+            }
+            .menu-botones button {
+                padding: 14px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="app-header">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <img src="logo-brasil.png" alt="Logo Brasil" style="height: 50px;">
+            <h1 style="color: white; margin: 0;">Dr.Vivallo</h1>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <h2 style="text-align: center; color: #2c3e50;">NO ROBE TU IDEA Y MAS ENCIMA TE LA HICE c:</h2>
+
+        <div class="menu-botones" style="margin-top:30px; max-width: 560px; margin-left:auto; margin-right:auto;">
+            <button class="btn-nuevo" onclick="window.location.href='nuevopaciente.html'">Ingresar nuevo paciente</button>
+            <button class="btn-activos" onclick="window.location.href='pacientes.html'">Ver pacientes</button>
+        </div>
+    </div>
+
+    <script>
+        localStorage.setItem("rol", "usuario");
+    </script>
+</body>
+</html>
